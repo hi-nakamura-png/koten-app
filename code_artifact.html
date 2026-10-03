@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>伊勢物語「初冠」 助動詞マスター</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap');
+        body {
+            font-family: 'Noto Serif JP', serif;
+            background-color: #f7f1e3;
+            color: #2c3e50;
+        }
+        .correct-animation {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-10 px-4">
+
+<div class="max-w-3xl w-full bg-white rounded-xl shadow-lg overflow-hidden">
+    <!-- Header -->
+    <header class="bg-[#2c3e50] text-white py-6 px-8 text-center">
+        <h1 class="text-3xl font-bold mb-2">伊勢物語「初冠」</h1>
+        <p class="text-lg opacity-80">助動詞マスタークイズ</p>
+    </header>
+
+    <!-- Quiz Container -->
+    <div id="quiz-container" class="p-8">
+        
+        <!-- Score Display -->
+    <div class="flex justify-between items-center mb-6 text-sm font-bold text-gray-500">
+        <span id="question-counter">第 1 問 / 全 10 問</span>
+        <span id="score-display">正解: 0</span>
+    </div>
+
+    <!-- Question Area -->
+        <div class="mb-8">
+            <h2 class="text-xl font-bold mb-4 border-b-2 border-indigo-200 pb-2">【問題】</h2>
+            <div class="bg-[#f1f2f6] p-4 rounded-lg mb-4 text-lg leading-relaxed shadow-inner">
+                <p id="question-text" class="mb-2">昔、男、初冠（ういこうぶり）<span class="font-bold text-red-600 underline">し</span>て、平城（なら）の京、春日（かすが）の里に、しるよし<span class="font-bold text-red-600 underline">し</span>て、狩りに往に<span class="font-bold text-red-600 underline">けり</span>。</p>
+            </div>
+            <p id="question-prompt" class="text-lg font-bold text-[#e1b12c]">上の文の「けり」の【意味】と【活用形】を答えよ。</p>
+        </div>
+
+        <!-- Options Area -->
+        <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Options will be injected here by JS -->
+        </div>
+
+        <!-- Result & Explanation Area (Hidden by default) -->
+        <div id="explanation-container" class="hidden mt-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+            <div id="result-message" class="text-2xl font-bold mb-4"></div>
+            
+            <h3 class="font-bold text-lg mb-2">【現代語訳】</h3>
+            <p id="translation-text" class="mb-4 text-gray-700"></p>
+            
+            <h3 class="font-bold text-lg mb-2">【文法解説】</h3>
+            <p id="grammar-explanation" class="text-gray-700 mb-4"></p>
+
+            <button id="next-btn" class="w-full bg-[#2c3e50] hover:bg-[#1a252f] text-white font-bold py-3 px-4 rounded transition duration-300">次の問題へ</button>
+        </div>
+    </div>
+
+    <!-- Final Score Screen (Hidden by default) -->
+    <div id="final-screen" class="hidden p-8 text-center">
+        <h2 class="text-3xl font-bold mb-6 text-[#2c3e50]">結果発表！</h2>
+        <div class="text-6xl font-bold mb-8 text-[#e1b12c]">
+            <span id="final-score"></span> / <span id="total-questions"></span>
+        </div>
+        <p id="final-message" class="text-xl mb-8 font-bold"></p>
+        <button id="restart-btn" class="bg-[#e1b12c] hover:bg-[#c89b25] text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 text-lg">もう一度挑戦する</button>
+    </div>
+</div>
+
+<script>
+    // Quiz Data based on Ise Monogatari "Uikoburi" (10 Questions)
+    const quizData = [
+        {
+            text: "昔、男、初冠して、平城の京、春日の里に、しるよしして、狩りに往に<span class='font-bold text-red-600 underline text-xl'>けり</span>。",
+            prompt: "「けり」の【意味】と【活用形】の正しい組み合わせは？",
+            options: [
+                "過去 ・ 終止形",
+                "詠嘆 ・ 終止形",
+                "過去 ・ 連用形",
+                "完了 ・ 終止形"
+            ],
+            correctAnswer: 0,
+            translation: "昔、ある男が、元服をして、平城京の春日の里に、領有している縁で、鷹狩りに行った。",
+            explanation: "「けり」は過去の助動詞「けり」の終止形です。文末で言い切りになっています。"
+        },
+        {
+            text: "その里に、いとなまめい<span class='font-bold text-red-600 underline text-xl'>たる</span>女はらから住みけり。",
+            prompt: "「たる」の【意味】と【活用形】の正しい組み合わせは？",
+            options: [
+                "存続 ・ 連体形",
+                "完了 ・ 終止形",
+                "断定 ・ 連体形",
+                "過去 ・ 連体形"
+            ],
+            correctAnswer: 0,
+            translation: "その里に、たいそう若々しく美しい姉妹が住んでいた。",
+            explanation: "「たる」は存続の助動詞「たり」の連体形です。体言（名詞）である「女はらから（姉妹）」に接続（修飾）しています。"
+        },
+        {
+            text: "この男、かいま見<span class='font-bold text-red-600 underline text-xl'>て</span>けり。",
+            prompt: "「て」の【意味】と【活用形】の正しい組み合わせは？",
+            options: [
+                "完了 ・ 連用形",
+                "強意 ・ 終止形",
+                "過去 ・ 連用形",
+                "存続 ・ 未然形"
+            ],
+            correctAnswer: 0,
+            translation: "この男は、（その姉妹を）のぞき見てしまった。",
+            explanation: "「て」は完了の助動詞「つ」の連用形です。下にある過去の助動詞「けり」に連用形として接続しています。「てけり」で「〜てしまった」という意味になります。"
+        },
+        {
+            text: "思ほえず、ふる里にいとはしたなくてあり<span class='font-bold text-red-600 underline text-xl'>けれ</span>ば、心地まどひにけり。",
+            prompt: "「けれ」の【意味】と【活用形】の正しい組み合わせは？",
+            options: [
+                "過去 ・ 已然形",
+                "詠嘆 ・ 已然形",
+                "完了 ・ 未然形",
+                "過去 ・ 連体形"
+            ],
+            correctAnswer: 0,
+            translation: "思いがけず、旧都（古びた里）にとても不似合いな様子で（美しい姉妹が）いたので、（男は）心を乱してしまった。",
+            explanation: "「けれ」は過去の助動詞「けり」の已然形です。接続助詞「ば」が下に続いて「〜ので（原因・理由）」を表します。"
+        },
+        {
+            text: "思ほえず、ふる里にいとはしたなくてありければ、心地まどひ<span class='font-bold text-red-600 underline text-xl'>に</span>けり。",
+            prompt: "「に」の【意味】と【活用形】の正しい組み合わせは？",
+            options: [
+                "完了 ・ 連用形",
+                "断定 ・ 連用形",
+                "過去 ・ 連体形",
+                "受身 ・ 未然形"
+            ],
+            correctAnswer: 0,
+            translation: "（男は）心を乱してしまった。",
+            explanation: "「に」は完了の助動詞「ぬ」の連用形です。下にある過去の助動詞「けり」に接続し、「にけり」で「〜てしまった」「〜たのだ」という意味になります。"
+        },
+        {
+            text: "思ほえ<span class='font-bold text-red-600 underline text-xl'>ず</span>、ふる里にいとはしたなくてありければ、心地まどひにけり。",
+            prompt: "「ず」の【意味】と【活用形】の正しい組み合わせは？",
+            options: [
+                "打消 ・ 連用形",
+                "打消 ・ 終止形",
+                "完了 ・ 連用形",
+                "不可能 ・ 終止形"
+            ],
+            correctAnswer: 0,
+            translation: "思いがけず、旧都にとても不似合いな様子で（美しい姉妹が）いたので...",
+            explanation: "「ず」は打消の助動詞「ず」の連用形です。動詞「思ほゆ（ヤ行下二段）」の未然形に接続しています。"
+        },
+        {
+            text: "男の着たり<span class='font-bold text-red-600 underline text-xl'>ける</span>狩衣の、裾を切りて、歌を書きてやる。",
+            prompt: "「ける」の【意味】と【活用形】の正しい組み合わせは？",
+            options: [
+                "過去 ・ 連体形",
+                "過去 ・ 終止形",
+                "詠嘆 ・ 連体形",
+                "完了 ・ 已然形"
+            ],
+            correctAnswer: 0,
+            translation: "男が着ていた狩衣の、裾を切って、歌を書いて送る。",
+            explanation: "「ける」は過去の助動詞「けり」の連体形です。体言（名詞）である「狩衣」に接続（修飾）しています。"
+        },
+        {
+            text: "春日野の若紫のすり衣しのぶの乱れ限り知られ<span class='font-bold text-red-600 underline text-xl'>ず</span>",
+            prompt: "「ず」の【意味】と【活用形】の正しい組み合わせは？",
+            options: [
+                "打消 ・ 終止形",
+                "打消 ・ 連用形",
+                "完了 ・ 終止形",
+                "推定 ・ 連体形"
+            ],
+            correctAnswer: 0,
+            translation: "（春日野の若紫で染めた乱れ模様のしのぶ摺りの衣のように、私の心があなたを思って乱れる様子は）限りを知らない（際限がない）。",
+            explanation: "「ず」は打消の助動詞「ず」の終止形です。「知られ」は自発の助動詞「らる」の未然形に接続しています。"
+        },
+        {
+            text: "ついでにおもしろきことともや思ひ<span class='font-bold text-red-600 underline text-xl'>けむ</span>。",
+            prompt: "「けむ」の【意味】と【活用形】の正しい組み合わせは？",
+            options: [
+                "過去推量 ・ 連体形",
+                "推量 ・ 終止形",
+                "過去 ・ 連体形",
+                "意志 ・ 未然形"
+            ],
+            correctAnswer: 0,
+            translation: "ついでに風流なことであると思ったのであろうか。",
+            explanation: "「けむ」は過去推量の助動詞「けむ」です。ここでは疑問の係助詞「や」を受けて、連体形（終止形と同形）の結びとなっています。"
+        },
+        {
+            text: "昔人は、かくいちはやきみやびをなむし<span class='font-bold text-red-600 underline text-xl'>ける</span>。",
+            prompt: "「ける」の【意味】と【活用形】の正しい組み合わせは？（「なむ」との関係に注目）",
+            options: [
+                "過去 ・ 連体形",
+                "過去 ・ 終止形",
+                "詠嘆 ・ 已然形",
+                "完了 ・ 連体形"
+            ],
+            correctAnswer: 0,
+            translation: "昔の人は、このように情熱的で風流な振る舞いをしたのだった。",
+            explanation: "「ける」は過去の助動詞「けり」の連体形です。手前にある強意の係助詞「なむ」を受けて、文末が連体形になる「係り結び」が起きています。"
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    // DOM Elements
+    const questionCounterEl = document.getElementById('question-counter');
+    const scoreDisplayEl = document.getElementById('score-display');
+    const questionTextEl = document.getElementById('question-text');
+    const questionPromptEl = document.getElementById('question-prompt');
+    const optionsContainer = document.getElementById('options-container');
+    const explanationContainer = document.getElementById('explanation-container');
+    const resultMessageEl = document.getElementById('result-message');
+    const translationTextEl = document.getElementById('translation-text');
+    const grammarExplanationEl = document.getElementById('grammar-explanation');
+    const nextBtn = document.getElementById('next-btn');
+    const finalScreen = document.getElementById('final-screen');
+    const quizContainer = document.getElementById('quiz-container');
+    const finalScoreEl = document.getElementById('final-score');
+    const totalQuestionsEl = document.getElementById('total-questions');
+    const finalMessageEl = document.getElementById('final-message');
+    const restartBtn = document.getElementById('restart-btn');
+
+    // Initialize Quiz
+    function loadQuestion() {
+        const currentData = quizData[currentQuestionIndex];
+        
+        // Reset UI
+        explanationContainer.classList.add('hidden');
+        optionsContainer.innerHTML = '';
+        
+        // Update headers
+        questionCounterEl.textContent = `第 ${currentQuestionIndex + 1} 問 / 全 ${quizData.length} 問`;
+        scoreDisplayEl.textContent = `正解: ${score}`;
+        
+        // Load content
+        questionTextEl.innerHTML = currentData.text;
+        questionPromptEl.textContent = currentData.prompt;
+
+        // Create option buttons
+        currentData.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.className = "bg-white border-2 border-[#2c3e50] text-[#2c3e50] font-bold py-4 px-6 rounded-lg hover:bg-[#2c3e50] hover:text-white transition duration-200 text-lg w-full text-left";
+            button.textContent = option;
+            button.onclick = () => checkAnswer(index, button);
+            optionsContainer.appendChild(button);
+        });
+    }
+
+    function checkAnswer(selectedIndex, selectedButton) {
+        // Disable all buttons after selection
+        const allButtons = optionsContainer.querySelectorAll('button');
+        allButtons.forEach(btn => btn.disabled = true);
+
+        const currentData = quizData[currentQuestionIndex];
+        const isCorrect = selectedIndex === currentData.correctAnswer;
+
+        if (isCorrect) {
+            score++;
+            scoreDisplayEl.textContent = `正解: ${score}`;
+            selectedButton.classList.remove('bg-white', 'text-[#2c3e50]', 'border-[#2c3e50]');
+            selectedButton.classList.add('bg-green-500', 'text-white', 'border-green-500', 'correct-animation');
+            resultMessageEl.textContent = "⭕️ 大正解！";
+            resultMessageEl.className = "text-2xl font-bold mb-4 text-green-600";
+        } else {
+            selectedButton.classList.remove('bg-white', 'text-[#2c3e50]', 'border-[#2c3e50]');
+            selectedButton.classList.add('bg-red-500', 'text-white', 'border-red-500');
+            
+            // Highlight correct answer
+            allButtons[currentData.correctAnswer].classList.remove('bg-white', 'text-[#2c3e50]', 'border-[#2c3e50]');
+            allButtons[currentData.correctAnswer].classList.add('bg-green-200', 'border-green-500', 'text-green-800');
+            
+            resultMessageEl.textContent = "❌ 残念！";
+            resultMessageEl.className = "text-2xl font-bold mb-4 text-red-600";
+        }
+
+        // Show explanation
+        translationTextEl.textContent = currentData.translation;
+        grammarExplanationEl.textContent = currentData.explanation;
+        explanationContainer.classList.remove('hidden');
+        
+        // Scroll to explanation
+        explanationContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    nextBtn.addEventListener('click', () => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            showFinalResults();
+        }
+    });
+
+    function showFinalResults() {
+        quizContainer.classList.add('hidden');
+        finalScreen.classList.remove('hidden');
+        
+        finalScoreEl.textContent = score;
+        totalQuestionsEl.textContent = quizData.length;
+
+        let message = "";
+        if (score === quizData.length) {
+            message = "素晴らしい！助動詞マスターです！✨";
+        } else if (score >= quizData.length * 0.6) {
+            message = "よくできました！もう少しで完璧ですね。👍";
+        } else {
+            message = "もう一度復習して、完璧を目指しましょう！📚";
+        }
+        finalMessageEl.textContent = message;
+    }
+
+    restartBtn.addEventListener('click', () => {
+        currentQuestionIndex = 0;
+        score = 0;
+        finalScreen.classList.add('hidden');
+        quizContainer.classList.remove('hidden');
+        loadQuestion();
+    });
+
+    // Start the quiz initially
+    loadQuestion();
+
+</script>
+
+</body>
+</html>
